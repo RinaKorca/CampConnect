@@ -3,11 +3,14 @@ const path = require("path");
 const mongoose = require("mongoose");
 const Campground = require("./models/campground");
 
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
+mongoose
+  .connect("mongodb://localhost:27017/campgrounds")
+  .then(() => {
+    console.log("Connected to MongoDB!");
+  })
+  .catch((err) => {
+    console.error("Connection error:", err);
+  });
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -21,11 +24,16 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.render("home");
 });
 
-app.get("/makeCampground ", (req, res) => {
-  res.send("Hello World!");
+app.get("/makecampground ", async (req, res) => {
+  const camp = new Campground({
+    title: "My Backyard",
+    description: "This is my backyard",
+  });
+  await camp.save();
+  res.send(camp);
 });
 
 app.listen(3000, () => {

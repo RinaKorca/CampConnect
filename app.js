@@ -2,15 +2,14 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const Campground = require("./models/campground");
+// const campgrounds = require("./seeds/cities");
+// const methodOverride = require("method-override");
+// const Campground = require("./models/campground");
 
-mongoose
-  .connect("mongodb://localhost:27017/campgrounds")
-  .then(() => {
-    console.log("Connected to MongoDB!");
-  })
-  .catch((err) => {
-    console.error("Connection error:", err);
-  });
+mongoose.connect("mongodb://127.0.0.1:27017/campconnect", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -23,25 +22,17 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
-app.get("/makecampground ", async (req, res) => {
-  const camp = new Campground({
-    title: "My Backyard",
-    description: "This is my backyard",
+app.get("/campgrounds", (req, res) => {
+  Campground.find({}, (err, campgrounds) => {
+    if (err) {
+      console.log(err);
+      res.send("Error fetching campgrounds");
+    } else {
+      res.render("campgrounds/index", { campgrounds });
+    }
   });
-  await camp.save();
-  res.send(camp);
 });
 
-app.listen(3000, () => {
-  console.log("Serving on port 3000");
+app.listen(5000, () => {
+  console.log("Serving on port 5000");
 });
-
-// const path = require('path');
-// const mongoose = require('mongoose');
-// const methodOverride = require('method-override');
-// const ejsMate = require('ejs-mate');
-// const session = require('express-session');
